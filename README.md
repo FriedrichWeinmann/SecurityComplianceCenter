@@ -1,33 +1,51 @@
-﻿# Description
+﻿# Security Compliance Center
 
-Insert a useful description for the SecurityComplianceCenter project here.
+## Synopsis
 
-Remember, it's the first thing a visitor will see.
+This module is designed to help you connect to and work with the O365 Security & Compliance Center service.
 
-# Project Setup Instructions
-## Working with the layout
+## Getting Started
 
- - Don't touch the psm1 file
- - Place functions you export in `functions/` (can have subfolders)
- - Place private/internal functions invisible to the user in `internal/functions` (can have subfolders)
- - Don't add code directly to the `postimport.ps1` or `preimport.ps1`.
-   Those files are designed to import other files only.
- - When adding files you load during `preimport.ps1`, be sure to add corresponding entries to `filesBefore.txt`.
-   The text files are used as reference when compiling the module during the build script.
- - When adding files you load during `postimport.ps1`, be sure to add corresponding entries to `filesAfter.txt`.
-   The text files are used as reference when compiling the module during the build script.
+Installing the module:
 
-## Setting up CI/CD
+```powershell
+# For all users on the computer (Requires elevation)
+Install-Module SecurityComplianceCenter
 
-> To create a PR validation pipeline, set up tasks like this:
+# Just for you
+Install-Module SecurityComplianceCenter -Scope CurrentUser
+```
 
- - Install Prerequisites (PowerShell Task; VSTS-Prerequisites.ps1)
- - Validate (PowerShell Task; VSTS-Validate.ps1)
- - Publish Test Results (Publish Test Results; NUnit format; Run no matter what)
+To connect to the SCC service, all you need to do is:
 
-> To create a build/publish pipeline, set up tasks like this:
+```powershell
+Connect-SCC
+```
 
- - Install Prerequisites (PowerShell Task; VSTS-Prerequisites.ps1)
- - Validate (PowerShell Task; VSTS-Validate.ps1)
- - Build (PowerShell Task; VSTS-Build.ps1)
- - Publish Test Results (Publish Test Results; NUnit format; Run no matter what)
+This uses modern authentication and supports MFA.
+However it does _not_ support Service Principal Authentication (using a certificate), which is a limit within the service itself.
+
+> Note: In the background, the ExchangeOnlineManagement module is used for the connection Details.
+> This makes it impossible to connect to both services at the same time at this time.
+
+## Examples
+
+This module provides tools to automate localization of Unified Labels, including the import of localization exports from the AIP portal.
+
+> List all current localization entries
+
+```powershell
+Get-SCCLabelLocalization
+```
+
+> Update a single localization entry
+
+```powershell
+Set-SccLabelLocalization -Name Confidential -Language 'de-DE' -Type DisplayName -Text 'Vertraulich'
+```
+
+> Import all localization XML as exported from AIP
+
+```powershell
+Import-SccLabelLocalizationXml -Path .\*.xml | Set-SccLabelLocalization
+```
