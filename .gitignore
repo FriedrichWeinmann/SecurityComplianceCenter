@@ -1,0 +1,22 @@
+﻿
+# ignore the settings folder and files for VSCode and PSS
+.vscode/*
+*.psproj
+*TempPoint*
+
+# Ignore staging info from Visual Studio
+library/SecurityComplianceCenter/.vs/*
+library/SecurityComplianceCenter/SecurityComplianceCenter/bin/*
+library/SecurityComplianceCenter/SecurityComplianceCenter/obj/*
+
+# ignore PowerShell Studio MetaData
+SecurityComplianceCenter/SecurityComplianceCenter.psproj
+SecurityComplianceCenter/SecurityComplianceCenter.psproj.bak
+SecurityComplianceCenter/SecurityComplianceCenter.psprojs
+SecurityComplianceCenter/SecurityComplianceCenter.psproj
+
+# ignore the TestResults
+TestResults/*
+
+# ignore the publishing Directory
+publish/*
