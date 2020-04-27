@@ -3,7 +3,7 @@
 	RootModule	      = 'SecurityComplianceCenter.psm1'
 	
 	# Version number of this module.
-	ModuleVersion	  = '1.0.0'
+	ModuleVersion	  = '1.1.0'
 	
 	# ID used to uniquely identify this module
 	GUID			  = '86d8860e-52a8-48f7-a5eb-f1ba7cded2bc'
@@ -43,6 +43,7 @@
 	FunctionsToExport = @(
 		'Connect-SCC'
 		'Get-SccLabelLocalization'
+		'Import-SccLabelLocalizationXml'
 		'Set-SccLabelLocalization'
 	)
 	
