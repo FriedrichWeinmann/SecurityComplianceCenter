@@ -2,7 +2,7 @@
 {
 <#
 	.SYNOPSIS
-		Imports label data from an export-xml of classic AIP label localization. 
+		Imports label data from an export-xml of classic AIP label localization.
 	
 	.DESCRIPTION
 		Imports label data from an export-xml of classic AIP label localization.
