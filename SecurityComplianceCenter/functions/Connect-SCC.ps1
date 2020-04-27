@@ -51,7 +51,7 @@
 		PS C:\> Connect-SCC
 	
 		Connects to the Securit & Compliance Center
-#>	
+#>
 	[Alias('cscc')]
 	[CmdletBinding()]
 	param (
