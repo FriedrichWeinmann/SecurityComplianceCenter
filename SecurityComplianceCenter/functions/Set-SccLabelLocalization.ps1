@@ -75,6 +75,11 @@
 		- Type
 		- Text
 		- At least one of: Name, FriendlyName, Identity, FQLN
+	
+	.EXAMPLE
+		PS C:\> Import-SccLabelLocalizationXml -Path .\*.xml | Set-SccLabelLocalization
+	
+		Imports all localization XML in the current folder and applies the localization data to the online labels in SCC.
 #>
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param (

@@ -3,7 +3,7 @@
 	RootModule	      = 'SecurityComplianceCenter.psm1'
 	
 	# Version number of this module.
-	ModuleVersion	  = '1.0.0'
+	ModuleVersion	  = '1.1.0'
 	
 	# ID used to uniquely identify this module
 	GUID			  = '86d8860e-52a8-48f7-a5eb-f1ba7cded2bc'
@@ -43,6 +43,7 @@
 	FunctionsToExport = @(
 		'Connect-SCC'
 		'Get-SccLabelLocalization'
+		'Import-SccLabelLocalizationXml'
 		'Set-SccLabelLocalization'
 	)
 	
@@ -68,19 +69,19 @@
 		PSData = @{
 			
 			# Tags applied to this module. These help with module discovery in online galleries.
-			# Tags = @()
+			Tags = @('SCC', 'Label', 'Labels')
 			
 			# A URL to the license for this module.
-			# LicenseUri = ''
+			LicenseUri = 'https://github.com/FriedrichWeinmann/SecurityComplianceCenter/blob/master/LICENSE'
 			
 			# A URL to the main website for this project.
-			# ProjectUri = ''
+			ProjectUri = 'https://github.com/FriedrichWeinmann/SecurityComplianceCenter'
 			
 			# A URL to an icon representing this module.
 			# IconUri = ''
 			
 			# ReleaseNotes of this module
-			# ReleaseNotes = ''
+			ReleaseNotes = 'https://github.com/FriedrichWeinmann/SecurityComplianceCenter/blob/master/SecurityComplianceCenter/changelog.md'
 			
 		} # End of PSData hashtable
 		
