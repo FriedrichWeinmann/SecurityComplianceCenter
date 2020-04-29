@@ -87,7 +87,7 @@
 			$PSBoundParameters['OutBuffer'] = 1
 		}
 		$parameters = @{
-			ShowBanner = $false
+			ShowBanner    = $false
 			ConnectionUri = Get-PSFConfigValue -FullName 'SecurityComplianceCenter.Connection.Uri'
 		}
 		$parameters += $PSBoundParameters | ConvertTo-PSFHashtable
