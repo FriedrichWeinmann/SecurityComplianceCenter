@@ -185,10 +185,12 @@
 	{
 		foreach ($dummyVar in 1)
 		{
+			$targetItem = [PSCustomObject]($PSBoundParameters | ConvertTo-PSFHashtable)
+			
 			#region Find Target Label
 			if (Test-PSFParameterBinding -ParameterName Name, FriendlyName, Identity -Not)
 			{
-				Stop-PSFFunction -String 'Set-SccLabelLocalization.Label.NoIdentity.Error' -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet
+				Stop-PSFFunction -String 'Set-SccLabelLocalization.Label.NoIdentity.Error' -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet -Target $targetItem
 			}
 			
 			$targetLabel = $null
@@ -213,23 +215,47 @@
 			
 			if (-not $targetLabel)
 			{
-				Stop-PSFFunction -String 'Set-SccLabelLocalization.Label.NotFound.Error' -StringValues $Name, $FriendlyName, $Identity -EnableException $EnableException -Category ObjectNotFound -Continue -Cmdlet $PSCmdlet
+				Stop-PSFFunction -String 'Set-SccLabelLocalization.Label.NotFound.Error' -StringValues $Name, $FriendlyName, $Identity -EnableException $EnableException -Category ObjectNotFound -Continue -Cmdlet $PSCmdlet -Target $targetItem
 			}
-			Write-PSFMessage -String 'Set-SccLabelLocalization.Processing' -StringValues $targetLabel.FriendlyName -Target $targetLabel.Name
 			#endregion Find Target Label
+
+			#region Validate Text
+			switch ($Type) {
+				'DisplayName' {
+					if ($Text.Length -gt 64) {
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet -Target $targetItem
+					}
+				}
+				'Tooltip' {
+					if ($Text.Length -gt 1000) {
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet -Target $targetItem
+					}
+				}
+			}
+
+			Write-PSFMessage -String 'Set-SccLabelLocalization.Processing' -StringValues $targetLabel.FriendlyName -Target $targetItem
+			#endregion Validate Text
 			
 			#region Process Updates
 			if ($Default -and $targetLabel.LS."$Type".$Language)
 			{
-				Write-PSFMessage -String 'Set-SccLabelLocalization.Skipping.AlreadySet' -StringValues $targetLabel.FriendlyName, $Type, $Language -Target $targetLabel.Name
+				Write-PSFMessage -String 'Set-SccLabelLocalization.Skipping.AlreadySet' -StringValues $targetLabel.FriendlyName, $Type, $Language -Target $targetItem
 				continue
 			}
 			
 			Invoke-PSFProtectedCommand -ActionString 'Set-SccLabelLocalization.Updating' -ActionStringValues $targetLabel.FriendlyName, $Type, $Language -ScriptBlock {
+				$backupHash = $targetLabel.LS["$Type"].Clone()
 				$targetLabel.LS["$Type"][$Language] = $Text
 				if ($DelayWrite) { $modifiedLabels[$targetLabel.Name] = $targetLabel }
-				else { Write-Label -LabelObject $targetLabel -ErrorAction Stop}
-			} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -Target $targetLabel.Name
+				else {
+					try { Write-Label -LabelObject $targetLabel -ErrorAction Stop }
+					catch {
+						# Rollback the change that failed
+						$targetLabel.LS["$Type"] = $backupHash
+						throw
+					}
+				}
+			} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -Target $targetItem
 			#endregion Process Updates
 		}
 	}
@@ -242,10 +268,10 @@
 			{
 				try
 				{
-					Write-PSFMessage -String 'Set-SccLabelLocalization.Updating.Bulk' -StringValues $labelObject.FriendlyName -Target $labelObject.Name
+					Write-PSFMessage -String 'Set-SccLabelLocalization.Updating.Bulk' -StringValues $labelObject.FriendlyName -Target $labelObject
 					Write-Label -LabelObject $labelObject -ErrorAction Stop
 				}
-				catch { Stop-PSFFunction -String 'Set-SccLabelLocalization.Updating.Bulk.Failed' -StringValues $labelObject.FriendlyName -Target $labelObject.Name -ErrorRecord $_ -EnableException $EnableException -Continue }
+				catch { Stop-PSFFunction -String 'Set-SccLabelLocalization.Updating.Bulk.Failed' -StringValues $labelObject.FriendlyName -Target $labelObject -ErrorRecord $_ -EnableException $EnableException -Continue }
 			}
 		}
 		#endregion Execute delayed write
