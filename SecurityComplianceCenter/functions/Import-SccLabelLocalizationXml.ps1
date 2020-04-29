@@ -65,11 +65,13 @@
 					
 					$type = 'Tooltip'
 					if ($entry.ID -Match 'DisplayName$') { $type = 'DisplayName' }
-
-					if ($type -eq 'DisplayName' -and $entry.LocalizedText.Length -gt 64) {
+					
+					if ($type -eq 'DisplayName' -and $entry.LocalizedText.Length -gt 64)
+					{
 						Write-PSFMessage -Level Warning -String 'Import-SccLabelLocalizationXml.DisplayName.TooLong' -StringValues ($entry.ID -split "/")[-2], $language, $entry.defaultText, $entry.LocalizedText
 					}
-					if ($type -eq 'Tooltip' -and $entry.LocalizedText.Length -gt 1000) {
+					if ($type -eq 'Tooltip' -and $entry.LocalizedText.Length -gt 1000)
+					{
 						Write-PSFMessage -Level Warning -String 'Import-SccLabelLocalizationXml.Tooltip.TooLong' -StringValues ($entry.ID -split "/")[-2], $language, $entry.defaultText, $entry.LocalizedText
 					}
 					[PSCustomObject]@{

@@ -147,12 +147,12 @@
 			
 			$dnHash = @{
 				localeKey = "displayName"
-				Settings = @()
+				Settings  = @()
 			}
 			foreach ($key in $LabelObject.LS.DisplayName.Keys)
 			{
 				$dnHash.Settings += [pscustomobject]@{
-					Key = $key
+					Key   = $key
 					Value = $LabelObject.LS.DisplayName[$key]
 				}
 			}
@@ -218,21 +218,24 @@
 				Stop-PSFFunction -String 'Set-SccLabelLocalization.Label.NotFound.Error' -StringValues $Name, $FriendlyName, $Identity -EnableException $EnableException -Category ObjectNotFound -Continue -Cmdlet $PSCmdlet -Target $targetItem
 			}
 			#endregion Find Target Label
-
+			
 			#region Validate Text
-			switch ($Type) {
+			switch ($Type)
+			{
 				'DisplayName' {
-					if ($Text.Length -gt 64) {
+					if ($Text.Length -gt 64)
+					{
 						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet -Target $targetItem
 					}
 				}
 				'Tooltip' {
-					if ($Text.Length -gt 1000) {
+					if ($Text.Length -gt 1000)
+					{
 						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet -Target $targetItem
 					}
 				}
 			}
-
+			
 			Write-PSFMessage -String 'Set-SccLabelLocalization.Processing' -StringValues $targetLabel.FriendlyName -Target $targetItem
 			#endregion Validate Text
 			
@@ -247,9 +250,11 @@
 				$backupHash = $targetLabel.LS["$Type"].Clone()
 				$targetLabel.LS["$Type"][$Language] = $Text
 				if ($DelayWrite) { $modifiedLabels[$targetLabel.Name] = $targetLabel }
-				else {
+				else
+				{
 					try { Write-Label -LabelObject $targetLabel -ErrorAction Stop }
-					catch {
+					catch
+					{
 						# Rollback the change that failed
 						$targetLabel.LS["$Type"] = $backupHash
 						throw
