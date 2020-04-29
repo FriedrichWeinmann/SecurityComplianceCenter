@@ -183,7 +183,7 @@
 	}
 	process
 	{
-		foreach ($dummyVar in 1)
+		:main foreach ($dummyVar in 1)
 		{
 			$targetItem = [PSCustomObject]($PSBoundParameters | ConvertTo-PSFHashtable)
 			
@@ -225,13 +225,13 @@
 				'DisplayName' {
 					if ($Text.Length -gt 64)
 					{
-						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet -Target $targetItem
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
 					}
 				}
 				'Tooltip' {
 					if ($Text.Length -gt 1000)
 					{
-						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -Cmdlet $PSCmdlet -Target $targetItem
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
 					}
 				}
 			}

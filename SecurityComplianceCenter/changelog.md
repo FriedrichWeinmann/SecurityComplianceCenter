@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.1.2 (2020-03-29)
+
+- Fix: Set-SccLabelLocalization - A bad entry would prevent subsequent updates to a label in non-cached mode
+
 ## 1.1.1 (2020-04-28)
 
 - Fix: Set-SccLabelLocalization - A bad entry would prevent subsequent updates to a label in non-cached mode
