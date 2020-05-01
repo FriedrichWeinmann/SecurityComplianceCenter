@@ -38,49 +38,49 @@
 	{
 		Assert-SccConnection -Cmdlet $PSCmdlet
 		
-		$culture = Get-Culture
-		[System.Collections.ArrayList]$labelsProcessed = @()
+		$allLabels = Get-EnrichedLabel
 	}
 	process
 	{
-		foreach ($labelName in $Name)
+		foreach ($label in $allLabels)
 		{
-			$labels = Get-CachedLabel -Id $labelName -Refresh
-			
-			foreach ($label in $labels)
-			{
-				if ($label.Name -in $labelsProcessed) { continue }
-				$null = $labelsProcessed.Add($label.Name)
-				
-				if ($label.DisplayName -notlike $DisplayName) { continue }
-				
-				$friendlyName = $label.DisplayName
-				$identity = $label.Name
-				if ($label.ParentID)
-				{
-					$friendlyName = '{0}\{1}' -f (Get-CachedLabel -Id $label.ParentID).DisplayName, $label.DisplayName
-					$identity = '{0}\{1}' -f (Get-CachedLabel -Id $label.ParentID).Name, $label.Name
+			$found = $false
+			foreach ($labelName in $Name) {
+				if ($label.Name -like $labelName) { $found = $true }
+			}
+			if (-not $found) { continue }
+
+			if ($label.DisplayName -notlike $DisplayName) { continue }
+
+			foreach ($languageKey in $label.LS.DisplayName.Keys) {
+				if ($Language -and $languageKey -notin $Language) { continue }
+
+				[pscustomobject]@{
+					PSTypeName   = 'SecurityComplianceCenter.Label.Locale'
+					FriendlyName = $label.friendlyName
+					LabelID	     = $label.Guid
+					FQLN     	 = $label.FQLN
+					LabelName    = $label.Name
+					Type		 = 'DisplayName'
+					Language	 = $languageKey
+					Text		 = $label.LS.DisplayName[$languageKey]
+					Label	     = $label
 				}
-				
-				$localeData = $label.LocaleSettings | ConvertFrom-Json
-				foreach ($localeDatum in $localeData)
-				{
-					foreach ($entry in $localeDatum.Settings)
-					{
-						if ($Language -and $entry.Key -notin $Language) { continue }
-						
-						[pscustomobject]@{
-							PSTypeName   = 'SecurityComplianceCenter.Label.Locale'
-							FriendlyName = $friendlyName
-							LabelID	     = $label.Guid
-							FQLN     	 = $identity
-							LabelName    = $label.Name
-							Type		 = $culture.TextInfo.ToTitleCase($localeDatum.LocaleKey)
-							Language	 = $entry.Key
-							Text		 = $entry.Value
-							Label	     = $label
-						}
-					}
+			}
+			
+			foreach ($languageKey in $label.LS.Tooltip.Keys) {
+				if ($Language -and $languageKey -notin $Language) { continue }
+
+				[pscustomobject]@{
+					PSTypeName   = 'SecurityComplianceCenter.Label.Locale'
+					FriendlyName = $label.friendlyName
+					LabelID	     = $label.Guid
+					FQLN     	 = $label.FQLN
+					LabelName    = $label.Name
+					Type		 = 'Tooltip'
+					Language	 = $languageKey
+					Text		 = $label.LS.Tooltip[$languageKey]
+					Label	     = $label
 				}
 			}
 		}

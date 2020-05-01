@@ -1,6 +1,10 @@
 ﻿# Changelog
 
-## 1.1.2 (2020-03-29)
+## 1.1.3 (2020-05-01)
+
+- Fix: Get-SccLabelLocalization - Fails with Watson report
+
+## 1.1.2 (2020-04-29)
 
 - Fix: Set-SccLabelLocalization - A bad entry would prevent subsequent updates to a label in non-cached mode
 
