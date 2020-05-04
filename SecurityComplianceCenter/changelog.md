@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.1.4 (2020-05-04)
+
+- Fix: Import-SccLabelLocalizationXml - invalid parameter on Stop-PSFFunction causes unexpected errors without proper handling
+
 ## 1.1.3 (2020-05-01)
 
 - Fix: Get-SccLabelLocalization - Fails with Watson report

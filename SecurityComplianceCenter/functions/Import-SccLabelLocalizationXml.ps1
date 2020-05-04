@@ -47,14 +47,14 @@
 		foreach ($pathItem in $Path)
 		{
 			try { $resolvedPaths = Resolve-PSFPath -Path $pathItem -Provider FileSystem }
-			catch { Stop-PSFFunction -String 'Import-SccLabelLocalizationXml.InvalidPath.Error' -StringValues $pathItem -Target $pathItem -EnableException $EnableException -ContinueLabel -ErrorRecord $_ }
+			catch { Stop-PSFFunction -String 'Import-SccLabelLocalizationXml.InvalidPath.Error' -StringValues $pathItem -Target $pathItem -EnableException $EnableException -Continue -ErrorRecord $_ }
 			
 			foreach ($fileItem in $resolvedPaths)
 			{
 				try { [xml]$xmlData = Get-Content -Path $fileItem -ErrorAction Stop -Encoding utf8 }
-				catch { Stop-PSFFunction -String 'Import-SccLabelLocalizationXml.Content.Error' -StringValues $fileItem -Target $fileItem -EnableException $EnableException -ContinueLabel -ErrorRecord $_ }
+				catch { Stop-PSFFunction -String 'Import-SccLabelLocalizationXml.Content.Error' -StringValues $fileItem -Target $fileItem -EnableException $EnableException -Continue -ErrorRecord $_ }
 				$language = $xmlData.Language.Id
-				if (-not $language) { Stop-PSFFunction -String 'Import-SccLabelLocalizationXml.Content.BadDocument' -StringValues $fileItem -Target $fileItem -EnableException $EnableException -ContinueLabel -Category InvalidData }
+				if (-not $language) { Stop-PSFFunction -String 'Import-SccLabelLocalizationXml.Content.BadDocument' -StringValues $fileItem -Target $fileItem -EnableException $EnableException -Continue -Category InvalidData }
 				
 				Write-PSFMessage -String 'Import-SccLabelLocalizationXml.Processing' -StringValues $fileItem -Target $fileItem
 				
