@@ -144,6 +144,19 @@
 			param (
 				$LabelObject
 			)
+
+			# Due to a change in service processing, we must only upload if all languages in both sets are filled out
+			if ($LabelObject.LS.DisplayName.Keys.Count -and $LabelObject.LS.Tooltip.Keys.Count)
+			{
+				foreach ($key in $LabelObject.LS.DisplayName.Keys) {
+					if ($key -in $LabelObject.LS.Tooltip.Keys) { continue }
+					$LabelObject.LS.Tooltip[$key] = $LabelObject.LS.Tooltip['default']
+				}
+				foreach ($key in $LabelObject.LS.Tooltip.Keys) {
+					if ($key -in $LabelObject.LS.DisplayName.Keys) { continue }
+					$LabelObject.LS.DisplayName[$key] = $LabelObject.LS.DisplayName['default']
+				}
+			}
 			
 			$dnHash = @{
 				localeKey = "displayName"
