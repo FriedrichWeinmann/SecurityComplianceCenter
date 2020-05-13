@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 1.1.8 (2020-05-13)
+
+- New: Command Enable-SccAuthentication - configures WinRM to allow modern authentication when policies forbid the use of basic authentication.
+- Upd: Import-SccLabelLocalizationXml - added validation for invalid characters among the imported XML.
+- Upd: Set-SccLabelLocalization - added input validation for invalid characters
+- Upd: Connect-SCC - added detection for disabled basic auth in WinRM client
+
 ## 1.1.4 (2020-05-04)
 
 - Fix: Import-SccLabelLocalizationXml - invalid parameter on Stop-PSFFunction causes unexpected errors without proper handling

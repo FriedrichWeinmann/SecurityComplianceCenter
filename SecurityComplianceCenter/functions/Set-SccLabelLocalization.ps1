@@ -227,11 +227,25 @@
 					{
 						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
 					}
+					if ($Text -match $script:PatternDisplayNameValidation)
+					{
+						$characters = $Text | Select-String "($script:PatternDisplayNameValidation)" -AllMatches | ForEach-Object {
+							@($_.Matches).ForEach{ $_.Groups[1].Value }
+						} | Select-Object -Unique | ForEach-Object { '"{0} (C: {1})"' -f $_, ([int][char]$_) }
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.BadCharacters' -StringValues $targetLabel.FriendlyName, $Language, ($characters -join ","), $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
+					}
 				}
 				'Tooltip' {
 					if ($Text.Length -gt 1000)
 					{
 						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
+					}
+					if ($Text -match $script:PatternTooltipValidation)
+					{
+						$characters = $Text | Select-String "($script:PatternTooltipValidation)" -AllMatches | ForEach-Object {
+							@($_.Matches).ForEach{ $_.Groups[1].Value }
+						} | Select-Object -Unique | ForEach-Object { '"{0} (C: {1})"' -f $_, ([int][char]$_) }
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.BadCharacters' -StringValues $targetLabel.FriendlyName, $Language, ($characters -join ","), $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
 					}
 				}
 			}

@@ -82,6 +82,13 @@
 	
 	begin
 	{
+		$settings = Get-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client\' -ErrorAction Ignore
+		if ($settings -and 0 -eq $settings.AllowBasic)
+		{
+			Write-PSFMessage -Level Warning -String 'Connect-SCC.Basic.Disabled'
+			throw 'Logon impossible, client policies prevent connection.'
+		}
+
 		if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$null))
 		{
 			$PSBoundParameters['OutBuffer'] = 1

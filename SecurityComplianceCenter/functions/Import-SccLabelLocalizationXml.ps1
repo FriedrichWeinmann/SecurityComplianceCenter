@@ -70,10 +70,25 @@
 					{
 						Write-PSFMessage -Level Warning -String 'Import-SccLabelLocalizationXml.DisplayName.TooLong' -StringValues ($entry.ID -split "/")[-2], $language, $entry.defaultText, $entry.LocalizedText
 					}
+					if ($type -eq 'DisplayName' -and $entry.LocalizedText -match $script:PatternDisplayNameValidation)
+					{
+						$characters = $entry.LocalizedText | Select-String "($script:PatternDisplayNameValidation)" -AllMatches | ForEach-Object {
+							@($_.Matches).ForEach{ $_.Groups[1].Value }
+						} | Select-Object -Unique | ForEach-Object { '"{0} (C: {1})"' -f $_, ([int][char]$_) }
+						Write-PSFMessage -Level Warning -String 'Import-SccLabelLocalizationXml.DisplayName.BadCharacters' -StringValues ($entry.ID -split "/")[-2], $language, ($characters -join ","), $entry.defaultText, $entry.LocalizedText
+					}
 					if ($type -eq 'Tooltip' -and $entry.LocalizedText.Length -gt 1000)
 					{
 						Write-PSFMessage -Level Warning -String 'Import-SccLabelLocalizationXml.Tooltip.TooLong' -StringValues ($entry.ID -split "/")[-2], $language, $entry.defaultText, $entry.LocalizedText
 					}
+					if ($type -eq 'Tooltip' -and $entry.LocalizedText -match $script:PatternTooltipValidation)
+					{
+						$characters = $entry.LocalizedText | Select-String "($script:PatternTooltipValidation)" -AllMatches | ForEach-Object {
+							@($_.Matches).ForEach{ $_.Groups[1].Value }
+						} | Select-Object -Unique | ForEach-Object { '"{0} (C: {1})"' -f $_, ([int][char]$_) }
+						Write-PSFMessage -Level Warning -String 'Import-SccLabelLocalizationXml.Tooltip.BadCharacters' -StringValues ($entry.ID -split "/")[-2], $language, ($characters -join ","), $entry.defaultText, $entry.LocalizedText
+					}
+					
 					[PSCustomObject]@{
 						Name = ($entry.ID -split "/")[-2]
 						Identity = $entry.ID.Replace("labelGroups/Sensitivity/labels/", "").Replace("subLabels/", "").Replace("/", "\") -replace '\\(DisplayName|Description)$'
