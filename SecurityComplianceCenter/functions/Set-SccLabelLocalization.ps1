@@ -144,6 +144,19 @@
 			param (
 				$LabelObject
 			)
+
+			# Due to a change in service processing, we must only upload if all languages in both sets are filled out
+			if ($LabelObject.LS.DisplayName.Keys.Count -and $LabelObject.LS.Tooltip.Keys.Count)
+			{
+				foreach ($key in $LabelObject.LS.DisplayName.Keys) {
+					if ($key -in $LabelObject.LS.Tooltip.Keys) { continue }
+					$LabelObject.LS.Tooltip[$key] = $LabelObject.LS.Tooltip['default']
+				}
+				foreach ($key in $LabelObject.LS.Tooltip.Keys) {
+					if ($key -in $LabelObject.LS.DisplayName.Keys) { continue }
+					$LabelObject.LS.DisplayName[$key] = $LabelObject.LS.DisplayName['default']
+				}
+			}
 			
 			$dnHash = @{
 				localeKey = "displayName"
@@ -227,11 +240,25 @@
 					{
 						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
 					}
+					if ($Text -match $script:PatternDisplayNameValidation)
+					{
+						$characters = $Text | Select-String "($script:PatternDisplayNameValidation)" -AllMatches | ForEach-Object {
+							@($_.Matches).ForEach{ $_.Groups[1].Value }
+						} | Select-Object -Unique | ForEach-Object { '"{0} (C: {1})"' -f $_, ([int][char]$_) }
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.DisplayName.BadCharacters' -StringValues $targetLabel.FriendlyName, $Language, ($characters -join ","), $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
+					}
 				}
 				'Tooltip' {
 					if ($Text.Length -gt 1000)
 					{
 						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.TooLong' -StringValues $targetLabel.FriendlyName, $Language, $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
+					}
+					if ($Text -match $script:PatternTooltipValidation)
+					{
+						$characters = $Text | Select-String "($script:PatternTooltipValidation)" -AllMatches | ForEach-Object {
+							@($_.Matches).ForEach{ $_.Groups[1].Value }
+						} | Select-Object -Unique | ForEach-Object { '"{0} (C: {1})"' -f $_, ([int][char]$_) }
+						Stop-PSFFunction -String 'Set-SccLabelLocalization.Text.Tooltip.BadCharacters' -StringValues $targetLabel.FriendlyName, $Language, ($characters -join ","), $Text -EnableException $EnableException -Category InvalidArgument -Continue -ContinueLabel main -Cmdlet $PSCmdlet -Target $targetItem
 					}
 				}
 			}
