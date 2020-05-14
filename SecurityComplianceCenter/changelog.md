@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.1.10 (2020-05-14)
+
+- Fix: Set-SccLabelLocalization - updated label processing for an edge case error
+
 ## 1.1.9 (2020-05-13)
 
 - New: Command Enable-SccAuthentication - configures WinRM to allow modern authentication when policies forbid the use of basic authentication.
