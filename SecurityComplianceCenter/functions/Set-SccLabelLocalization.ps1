@@ -184,8 +184,11 @@
 			
 			try
 			{
-				if ($dnHash.Settings.Count -gt 0) { Set-Label -Identity $LabelObject.Guid -LocaleSettings ($dnHash | ConvertTo-Json) -ErrorAction Stop -WarningAction SilentlyContinue }
-				if ($ttHash.Settings.Count -gt 0) { Set-Label -Identity $LabelObject.Guid -LocaleSettings ($ttHash | ConvertTo-Json) -ErrorAction Stop -WarningAction SilentlyContinue }
+				if ($dnHash.Settings.Count -and $ttHash.Settings.Count) {
+					Set-Label -Identity $LabelObject.Guid -LocaleSettings ($dnHash | ConvertTo-Json), ($ttHash | ConvertTo-Json) -ErrorAction Stop -WarningAction SilentlyContinue
+				}
+				elseif ($dnHash.Settings.Count -gt 0) { Set-Label -Identity $LabelObject.Guid -LocaleSettings ($dnHash | ConvertTo-Json) -ErrorAction Stop -WarningAction SilentlyContinue }
+				elseif ($ttHash.Settings.Count -gt 0) { Set-Label -Identity $LabelObject.Guid -LocaleSettings ($ttHash | ConvertTo-Json) -ErrorAction Stop -WarningAction SilentlyContinue }
 			}
 			catch { throw }
 		}
