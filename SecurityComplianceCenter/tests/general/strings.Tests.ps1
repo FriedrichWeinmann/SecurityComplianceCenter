@@ -6,18 +6,22 @@
     It also checks, whether the language files have orphaned entries that need cleaning up.
 #>
 
-$moduleRoot = (Get-Module SecurityComplianceCenter).ModuleBase
-$stringsResults = Export-PSMDString -ModuleRoot $moduleRoot
-$exceptions = & "$PSScriptRoot\strings.Exceptions.ps1"
+
 
 Describe "Testing localization strings" {
-    foreach ($stringEntry in $stringsResults) {
+	$moduleRoot = (Get-Module SecurityComplianceCenter).ModuleBase
+	$stringsResults = Export-PSMDString -ModuleRoot $moduleRoot
+	$exceptions = & "$global:testroot\general\strings.Exceptions.ps1"
+	
+	foreach ($stringEntry in $stringsResults) {
         if ($stringEntry.String -eq "key") { continue } # Skipping the template default entry
-        It "Should be used & have text: $($stringEntry.String)" {
+		It "Should be used & have text: $($stringEntry.String)" -TestCases @{ stringEntry = $stringEntry; exceptions = $exceptions } {
             if ($exceptions.LegalSurplus -notcontains $stringEntry.String) {
                 $stringEntry.Surplus | Should -BeFalse
-            }
-            $stringEntry.Text | Should -Not -BeNullOrEmpty
+			}
+			if ($exceptions.NoTextNeeded -notcontains $stringEntry.String) {
+				$stringEntry.Text | Should -Not -BeNullOrEmpty
+			}
         }
     }
 }

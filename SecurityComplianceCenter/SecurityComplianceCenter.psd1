@@ -26,12 +26,14 @@
 	# Modules that must be imported into the global environment prior to importing
 	# this module
 	RequiredModules   = @(
-		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.1.59' }
-		@{ ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '0.4368.1' }
+		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.10.318' }
+		@{ ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '3.4.0' }
 	)
 	
 	# Assemblies that must be loaded prior to importing this module
-	# RequiredAssemblies = @('bin\SecurityComplianceCenter.dll')
+	RequiredAssemblies = @(
+		'bin\Fred.PowerShell.Certificate.Parameter.dll'
+	)
 	
 	# Type files (.ps1xml) to be loaded when importing this module
 	# TypesToProcess = @('xml\SecurityComplianceCenter.Types.ps1xml')
