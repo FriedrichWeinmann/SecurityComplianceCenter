@@ -1,6 +1,5 @@
-﻿function Connect-SCC
-{
-<#
+﻿function Connect-SCC {
+	<#
 	.SYNOPSIS
 		Establishes a Modern Auth connection with the Security & Compliance Center.
 	
@@ -46,12 +45,34 @@
 		The credentials to use when connecting to SCC.
 		Needed for unattended automation.
 		If this parameter is omitted, you will be prompted interactively.
+
+	.PARAMETER AppId
+		The AppId parameter specifies the application ID of the service principal that's used in certificate based
+		authentication (CBA). A valid value is the GUID of the application ID (service principal). For example,
+		`36ee4c6c-0812-40a2-b820-b22ebd02bce3`.
+
+		For more information, see App-only authentication for unattended scripts in the Exchange Online PowerShell
+		module (https://aka.ms/exo-cba).
+	
+	.PARAMETER CommandName
+		The CommandName parameter specifies the comma separated list of commands to import into the session. Use this
+		parameter for applications or scripts that use a specific set of cmdlets. Reducing the number of cmdlets in
+		the session helps improve performance and reduces the memory footprint of the application or script.
+
+	.PARAMETER FormatTypeName
+		The FormatTypeName parameter specifies the output format of the cmdlet.
+
+	.PARAMETER Certificate
+		Certificate to use together with an AppId for certificate-based authentication.
+		Can be either X509Certificate2 object or the thumbprint of one available in the certificate store.
+		Will fail if a private key is unavailable!
 	
 	.EXAMPLE
 		PS C:\> Connect-SCC
 	
 		Connects to the Securit & Compliance Center
 #>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingEmptyCatchBlock", "")]
 	[Alias('cscc')]
 	[CmdletBinding()]
 	param (
@@ -77,62 +98,93 @@
 		$UserPrincipalName,
 		
 		[PSCredential]
-		$Credential
+		$Credential,
+
+		[string]
+		$AppId,
+
+		[string[]]
+		$CommandName,
+
+		[string[]]
+		$FormatTypeName,
+
+		[Fred.PowerShell.Certificate.Parameter.CertificateParameter]
+		$Certificate
 	)
 	
-	begin
-	{
+	begin {
 		$settings = Get-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client\' -ErrorAction Ignore
-		if ($settings -and 0 -eq $settings.AllowBasic)
-		{
+		if ($settings -and 0 -eq $settings.AllowBasic) {
 			Write-PSFMessage -Level Warning -String 'Connect-SCC.Basic.Disabled'
-			throw 'Logon impossible, client policies prevent connection.'
 		}
 
-		if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$null))
-		{
+		if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$null)) {
 			$PSBoundParameters['OutBuffer'] = 1
 		}
-		$parameters = @{
-			ShowBanner    = $false
-			ConnectionUri = Get-PSFConfigValue -FullName 'SecurityComplianceCenter.Connection.Uri'
+		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -ReferenceCommand Connect-IPPSSession
+		$parameters.ConnectionUri = switch ("$ExchangeEnvironmentName") {
+			O365China { 'https://ps.compliance.protection.partner.outlook.cn/powershell-liveid' }
+			O365USGovDoD { 'https://l5.ps.compliance.protection.office365.us/powershell-liveid/' }
+			O365USGovGCCHigh { 'https://ps.compliance.protection.office365.us/powershell-liveid/' }
+			default { Get-PSFConfigValue -FullName 'SecurityComplianceCenter.Connection.Uri' }
 		}
-		$parameters += $PSBoundParameters | ConvertTo-PSFHashtable
-		
-		try
-		{
-			$wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Connect-ExchangeOnline', [System.Management.Automation.CommandTypes]::Function)
+		if (-not $AzureADAuthorizationEndpointUri) {
+			$parameters.AzureADAuthorizationEndpointUri = switch ("$ExchangeEnvironmentName") {
+				O365China { 'https://login.chinacloudapi.cn/common' }
+				O365USGovDoD { 'https://login.microsoftonline.us/common' }
+				O365USGovGCCHigh { 'https://login.microsoftonline.us/common' }
+				default { 'https://login.microsoftonline.com/common' }
+			}
+		}
+
+		try {
+			$wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Connect-IPPSSession', [System.Management.Automation.CommandTypes]::Function)
 			$scriptCmd = { & $wrappedCmd @parameters }
 			$steppablePipeline = $scriptCmd.GetSteppablePipeline()
-			$steppablePipeline.Begin($PSCmdlet)
+			$steppablePipeline.Begin($PSCmdlet) 2>$null
 		}
-		catch
-		{
-			throw
+		catch {
+			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
 	
-	process
-	{
-		try
-		{
+	process {
+		$module = Get-Module ExchangeOnlineManagement
+		try {
+			# Disable the verbose banner on screen
+			& $module { function script:Write-Host {} }
 			$steppablePipeline.Process($_)
 		}
-		catch
-		{
-			throw
+		catch {
+			try { $steppablePipeline.End() }
+			catch { }
+			$PSCmdlet.ThrowTerminatingError($_)
+		}
+		finally {
+			# Ugly, but removes the temporary Write-Host override to prevent affecting outside of our own command
+			$utilityHost = [PSFramework.Utility.UtilityHost]
+			if ($PSVersionTable.PSVersion.Major -gt 5) {
+				$state = $utilityHost::GetPrivateField("<SessionState>k__BackingField",$module)
+				$stateInternal = $utilityHost::GetPrivateProperty("Internal",$state)
+				$moduleScope = $utilityHost::GetPrivateField('<ModuleScope>k__BackingField', $stateInternal)
+			}
+			else {
+				$state = $utilityHost::GetPrivateField("_sessionState",$module)
+				$stateInternal = $utilityHost::GetPrivateProperty("Internal",$state)
+				$moduleScope = $utilityHost::GetPrivateField('_moduleScope', $stateInternal)
+			}
+			$functions = $utilityHost::GetPrivateField('_functions', $moduleScope)
+			$null = $functions.Remove("Write-Host")
 		}
 	}
 	
-	end
-	{
-		try
-		{
+	end {
+		try {
 			$steppablePipeline.End()
 		}
-		catch
-		{
-			throw
+		catch {
+			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
 }

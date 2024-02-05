@@ -1,5 +1,13 @@
 ﻿# Changelog
 
+## 1.2.15 (2024-02-05)
+
+- Upd: Updated dependencies for better reliability
+- Upd: Connect-Scc - added support for CBA
+- Upd: Connect-Scc - removed requirement for basic auth enablement and dependency on PS Remoting
+- Upd: Connect-Scc - better experience connecting to specialized regions (Such as the china cloud or DOD)
+- Fix: Connect-Scc - better connection reliability
+
 ## 1.1.10 (2020-05-14)
 
 - Fix: Set-SccLabelLocalization - updated label processing for an edge case error

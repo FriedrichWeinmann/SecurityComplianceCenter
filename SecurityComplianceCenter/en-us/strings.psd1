@@ -1,7 +1,7 @@
 ﻿# This is where the strings go, that are written by
 # Write-PSFMessage, Stop-PSFFunction or the PSFramework validation scriptblocks
 @{
-	'Connect-SCC.Basic.Disabled'                               = 'Cannot connect to SCC: Local client policies prevent the use of PowerShell remoting with Modern Authentication! This happens when a Group Policy prevents the use of Basic Authentication for Clients - WinRM does not know the difference between basic authentication and modern authentication. To enable the ability to connect, use "Enable-SccAuthentication" from a console ran "As Administrator"' # 
+	'Connect-SCC.Basic.Disabled'                               = 'Local client policies prevent the use of PowerShell remoting with Modern Authentication. As most of the code has been migrated to REST this should not affect most of the commands. This happens when a Group Policy prevents the use of Basic Authentication for Clients - WinRM does not know the difference between basic authentication and modern authentication. If you encounter problems with an expected command not existing or reporting remoting-based problems, use "Enable-SccAuthentication" from a console ran "As Administrator"' # 
 	'Enable-SccAuthentication.Enabling'                        = 'Enabling Modern Authentication for PowerShell Remoting' # 
 	'Enable-SccAuthentication.NotElevated'                     = 'This command requires elevation. Please start a new console "As Administrator"' # 
 	'Import-SccLabelLocalizationXml.Content.BadDocument'       = 'Not an export file from AIP: {0}' # $fileItem
