@@ -3,7 +3,7 @@
 	RootModule	      = 'SecurityComplianceCenter.psm1'
 	
 	# Version number of this module.
-	ModuleVersion	  = '1.2.15'
+	ModuleVersion	  = '1.2.17'
 	
 	# ID used to uniquely identify this module
 	GUID			  = '86d8860e-52a8-48f7-a5eb-f1ba7cded2bc'
@@ -26,7 +26,7 @@
 	# Modules that must be imported into the global environment prior to importing
 	# this module
 	RequiredModules   = @(
-		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.10.318' }
+		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.12.346' }
 		@{ ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '3.4.0' }
 	)
 	
@@ -36,7 +36,7 @@
 	)
 	
 	# Type files (.ps1xml) to be loaded when importing this module
-	# TypesToProcess = @('xml\SecurityComplianceCenter.Types.ps1xml')
+	TypesToProcess = @('xml\SecurityComplianceCenter.Types.ps1xml')
 	
 	# Format files (.ps1xml) to be loaded when importing this module
 	FormatsToProcess = @('xml\SecurityComplianceCenter.Format.ps1xml')

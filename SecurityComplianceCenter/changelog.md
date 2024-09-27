@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## 1.2.17 (2024-09-27)
+
+- Upd: Updated dependencies for better reliability
+- Upd: Get-Label - extended settings as a hashtable on a new, calculated property: "SettingsExt"
+
 ## 1.2.15 (2024-02-05)
 
 - Upd: Updated dependencies for better reliability
